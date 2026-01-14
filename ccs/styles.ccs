@@ -1,0 +1,28 @@
+body {
+  font-family: system-ui;
+  background: #f6f9ff;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.big {
+  font-size: 48px;
+  text-align: center;
+}
+
+button {
+  width: 100%;
+  height: 56px;
+  border-radius: 16px;
+  background: #4f7cff;
+  color: white;
+  font-size: 18px;
+  border: none;
+}
