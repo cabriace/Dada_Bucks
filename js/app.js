@@ -1,19 +1,36 @@
+import { supabase } from "./supabase.js";
 import { render } from "./ui.js";
+import { checkDailyReset } from "./dailyReset.js";
 
-const a = Math.floor(Math.random() * 10);
-const b = Math.floor(Math.random() * 10);
-const answer = a + b;
+window.login = async () => {
+  const email = email.value;
+  const password = password.value;
 
-document.getElementById("math-question").innerText =
-  `${a} + ${b} = ?`;
-
-window.unlock = () => {
-  const val = Number(document.getElementById("math-input").value);
-  if (val === answer) {
-    document.getElementById("math-lock").style.display = "none";
-  } else {
-    alert("Try again!");
-  }
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) alert(error.message);
 };
 
-render();
+window.signup = async () => {
+  const email = email.value;
+  const password = password.value;
+
+  const { error } = await supabase.auth.signUp({ email, password });
+  if (error) alert(error.message);
+};
+
+window.logout = async () => {
+  await supabase.auth.signOut();
+};
+
+supabase.auth.onAuthStateChange(async (_, session) => {
+  if (session) {
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+    await checkDailyReset();
+    render();
+  } else {
+    document.getElementById("auth").style.display = "block";
+    document.getElementById("app").style.display = "none";
+  }
+});
