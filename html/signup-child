@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Child Signup</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<h2>Join Family</h2>
+
+<input id="first" placeholder="First name">
+<input id="last" placeholder="Last name">
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+<input id="confirm" type="password" placeholder="Confirm Password">
+<input id="family" placeholder="Family Key">
+
+<button id="joinBtn">Join</button>
+
+<script type="module">
+  import { signup } from "./js/auth.js";
+  import { supabase } from "./js/supabase.js";
+
+  joinBtn.onclick = async () => {
+    if (pass.value !== confirm.value) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    const { data: parent } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("family_key", family.value)
+      .single();
+
+    if (!parent) {
+      alert("Invalid family key");
+      return;
+    }
+
+    const user = await signup(email.value, pass.value);
+
+    await supabase.from("profiles").update({
+      role: "child",
+      first_name: first.value,
+      last_name: last.value,
+      family_key: family.value
+    }).eq("id", user.id);
+
+    location.href = "child-home.html";
+  };
+</script>
+
+</body>
+</html>
