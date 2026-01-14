@@ -1,9 +1,9 @@
 import { Tasks } from "./models.js";
-import { TaskManager, StrikeManager, Economy } from "./managers.js";
+import { TaskManager, StrikeManager, EconomyManager } from "./managers.js";
 
 export function render() {
   document.getElementById("balance").innerText =
-    Economy.getBalance() + " DB";
+    EconomyManager.getBalance() + " DB";
 
   renderStrikes();
   renderTasks();
