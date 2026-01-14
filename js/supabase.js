@@ -1,4 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = 'https://losuovcrwptneatkknlo.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+export const supabase = createClient(
+  "https://losuovcrwptneatkknlo.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxvc3VvdmNyd3B0bmVhdGtrbmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0MTM2MjcsImV4cCI6MjA4Mzk4OTYyN30.3js7ikeuRrVSvp49c1CW98nQ3TTKjI9jccXyYSH_YDg"
+);
