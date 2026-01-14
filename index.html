@@ -1,31 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Dada Bucks</title>
-  <link rel="stylesheet" href="css/styles.css">
-</head>
 <body>
 
-<div id="math-lock">
-  <p id="math-question"></p>
-  <input id="math-input">
-  <button onclick="unlock()">Unlock</button>
+<div id="auth">
+  <h2>Login / Signup</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <button onclick="signup()">Signup</button>
 </div>
 
-<h1>Dada Bucks</h1>
+<div id="app" style="display:none">
+  <button onclick="logout()">Logout</button>
 
-<div class="avatars">
-  <img src="assets/avatars/bear.png">
-  <img src="assets/avatars/cat.png">
-  <img src="assets/avatars/dino.png">
+  <h1>Dada Bucks</h1>
+  <div id="role"></div>
+  <div id="balance"></div>
+  <div id="strikes"></div>
+
+  <h2>Tasks</h2>
+  <div id="tasks"></div>
+
+  <h2>Spend Requests</h2>
+  <div id="requests"></div>
 </div>
-
-<div id="balance"></div>
-<div id="strikes"></div>
-
-<h2>Earn</h2>
-<div id="tasks"></div>
 
 <script type="module" src="js/app.js"></script>
 </body>
-</html>
