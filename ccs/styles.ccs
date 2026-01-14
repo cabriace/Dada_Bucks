@@ -26,3 +26,30 @@ button {
   font-size: 18px;
   border: none;
 }
+.strike {
+  font-size: 32px;
+  opacity: 0.2;
+}
+.strike.on {
+  opacity: 1;
+}
+
+#math-lock {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: grid;
+  place-items: center;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  margin: 10px 0;
+}
+
+button {
+  font-size: 24px;
+  border-radius: 16px;
+}
