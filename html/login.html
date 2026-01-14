@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dada Bucks – Login</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<h1>Dada Bucks</h1>
+
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<button id="loginBtn">Login</button>
+
+<p>
+  Don’t have an account?
+  <a href="signup-role.html">Sign up</a>
+</p>
+
+<script type="module">
+  import { login } from "./js/auth.js";
+  import { redirectByRole } from "./js/session.js";
+
+  loginBtn.onclick = async () => {
+    try {
+      await login(email.value, password.value);
+      await redirectByRole();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+</script>
+
+</body>
+</html>
