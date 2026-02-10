@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createProfileForAuthUser } from '@/services/profile.service'
 
 // ============================================================================
-// ENV SETUP (DO NOT THROW AT IMPORT TIME — breaks Vercel)
+// ENV SETUP (Vercel-safe)
 // ============================================================================
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
@@ -17,7 +17,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undef
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error(
-    '❌ Missing Supabase env vars. Make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in Vercel.'
+    '❌ Missing Supabase env vars. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel.'
   )
 }
 
@@ -27,7 +27,7 @@ export const supabase = createClient(
 )
 
 // ============================================================================
-// TYPE DEFINITIONS
+// TYPES
 // ============================================================================
 
 export type UserRole = 'parent' | 'co_parent' | 'child'
@@ -58,14 +58,6 @@ export interface Child {
   updated_at: string
 }
 
-export interface ParentChildLink {
-  id: string
-  parent_id: string
-  child_id: string
-  role: 'parent' | 'co_parent'
-  created_at: string
-}
-
 export interface LinkCode {
   id: string
   code: string
@@ -89,15 +81,6 @@ export interface Task {
   created_at: string
 }
 
-export interface TaskLog {
-  id: string
-  task_id: string
-  child_id: string
-  completed_at: string
-  payout: number
-  deposited: boolean
-}
-
 export interface Transaction {
   id: string
   child_id: string
@@ -118,19 +101,11 @@ export interface Transaction {
 export interface SpendRequest {
   id: string
   child_id: string
-  items: SpendRequestItem[]
   total_cost: number
   status: 'pending' | 'approved' | 'denied'
   requested_at: string
   responded_at: string | null
   responded_by: string | null
-}
-
-export interface SpendRequestItem {
-  name: string
-  icon: string
-  cost: number
-  quantity: number
 }
 
 // ============================================================================
@@ -168,17 +143,8 @@ export async function signUpChild(
   age: number,
   linkCode: string
 ) {
-  const { data: codeData, error: codeError } = await supabase
-    .from('link_codes')
-    .select('*')
-    .eq('code', linkCode)
-    .eq('used', false)
-    .gt('expires_at', new Date().toISOString())
-    .single()
-
-  if (codeError || !codeData) {
-    throw new Error('Invalid or expired linking code')
-  }
+  const code = await validateLinkCode(linkCode)
+  if (!code) throw new Error('Invalid or expired linking code')
 
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) throw error
@@ -207,13 +173,13 @@ export async function signUpChild(
 
   if (childError) throw childError
 
-  const { error: linkError } = await supabase.from('parent_child_links').insert({
-    parent_id: codeData.created_by,
-    child_id: data.user.id,
-    role: 'parent',
-  })
-
-  if (linkError) throw linkError
+  await supabase
+    .from('parent_child_links')
+    .insert({
+      parent_id: code.created_by,
+      child_id: data.user.id,
+      role: 'parent',
+    })
 
   await supabase
     .from('link_codes')
@@ -249,4 +215,42 @@ export async function getProfile(userId: string) {
 
   if (error) throw error
   return data as Profile
+}
+
+// ============================================================================
+// LINK CODE HELPERS (FIXES YOUR BUILD ERRORS)
+// ============================================================================
+
+export async function generateLinkCode(
+  parentId: string,
+  role: 'child' | 'co_parent'
+): Promise<string> {
+  const code = Math.floor(100000 + Math.random() * 900000).toString()
+
+  const expiresAt = new Date()
+  expiresAt.setDate(expiresAt.getDate() + 7)
+
+  const { error } = await supabase.from('link_codes').insert({
+    code,
+    created_by: parentId,
+    role,
+    expires_at: expiresAt.toISOString(),
+    used: false,
+  })
+
+  if (error) throw error
+  return code
+}
+
+export async function validateLinkCode(code: string): Promise<LinkCode | null> {
+  const { data, error } = await supabase
+    .from('link_codes')
+    .select('*')
+    .eq('code', code)
+    .eq('used', false)
+    .gt('expires_at', new Date().toISOString())
+    .single()
+
+  if (error) return null
+  return data as LinkCode
 }
