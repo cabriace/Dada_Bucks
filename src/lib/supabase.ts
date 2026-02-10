@@ -98,15 +98,24 @@ export interface Transaction {
   created_at: string
 }
 
+export interface SpendRequestItem {
+  name: string
+  icon: string
+  cost: number
+  quantity: number
+}
+
 export interface SpendRequest {
   id: string
   child_id: string
+  items: SpendRequestItem[]   // 👈 ADD THIS
   total_cost: number
   status: 'pending' | 'approved' | 'denied'
   requested_at: string
   responded_at: string | null
   responded_by: string | null
 }
+
 
 // ============================================================================
 // AUTH HELPERS
