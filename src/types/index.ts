@@ -9,14 +9,17 @@
 // USER & PROFILE TYPES
 // ============================================================================
 
-export type UserRole = 'parent' | 'child';
+// ---------- Profile (matches DB) ----------
+export type UserRole = 'parent' | 'co_parent' | 'child';
 
-export interface User {
-  id: string;
-  name: string;
+export interface Profile {
+  id: string;                 // UUID (auth user id)
+  email: string | null;
   role: UserRole;
-  avatar?: string;
-  createdAt: Date;
+  display_name: string | null;
+  avatar: string | null;
+  age: number | null;
+  created_at: string;         // ISO string from Supabase
 }
 
 export interface ChildProfile {
