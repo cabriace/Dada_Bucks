@@ -181,23 +181,22 @@ export async function signUpChild(
   if (authError) throw authError;
   if (!authData.user) throw new Error('Failed to create user');
 
-  // 3. Insert profile
-  const { error: profileError } = await supabase.from('profiles').insert({
-    id: authData.user.id,
-    name,
+    // 3. Create profile via service
+  await createProfileForAuthUser({
+    userId: authData.user.id,
+    email,
+    firstName: name, // using single name as firstName for display
+    lastName: null,
     age,
     role: 'child',
-    avatar: '👧',
   });
-
-  if (profileError) throw profileError;
 
   // 4. Insert into children table
   const { error: childError } = await supabase.from('children').insert({
     id: authData.user.id,
     balance: 0,
     savings_balance: 0,
-    strikes: 0,
+    strike_count: 0,
     total_earned: 0,
     total_spent: 0,
     pending_earnings: 0,
@@ -209,7 +208,7 @@ export async function signUpChild(
 
   // 5. Create parent-child link
   const { error: linkError } = await supabase.from('parent_child_links').insert({
-    parent_id: codeData.created_by,
+    parent_id: codeData.parent_id || codeData.created_by || codeData.parentId,
     child_id: authData.user.id,
     role: 'parent',
   });
@@ -220,12 +219,11 @@ export async function signUpChild(
   const { error: updateError } = await supabase
     .from('link_codes')
     .update({ used: true, used_by: authData.user.id })
-    .eq('id', codeData.id);
+    .eq('code', linkCode); // use code field to update
 
   if (updateError) throw updateError;
 
   return authData.user;
-}
 
 export async function signIn(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({
