@@ -6,6 +6,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { createProfileForAuthUser } from '@/services/profile.service';
+import type { UserRole } from '@/types'; // optional if you need the type
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -136,20 +138,19 @@ export async function signUpParent(
   if (authError) throw authError;
   if (!authData.user) throw new Error('Failed to create user');
 
-  // 2. Insert profile
-  const { error: profileError } = await supabase.from('profiles').insert({
-    id: authData.user.id,
-    first_name: firstName,
-    last_name: lastName,
+  // 2. Create profile using service (this inserts into profiles table)
+  await createProfileForAuthUser({
+    userId: authData.user.id,
+    email,
+    firstName,
+    lastName,
     age,
     role,
-    avatar: null,
   });
-
-  if (profileError) throw profileError;
 
   return authData.user;
 }
+
 
 export async function signUpChild(
   email: string,
